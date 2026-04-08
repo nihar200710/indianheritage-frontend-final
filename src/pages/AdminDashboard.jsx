@@ -1,8 +1,22 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react'; // Added useEffect
+import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
+import { useAuth } from '../context/AuthContext'; // Added useAuth
 import { Users, ShieldCheck, FileText, AlertTriangle, LayoutDashboard } from 'lucide-react';
 
 export default function AdminDashboard() {
+  const { user } = useAuth(); // Get user from context
+  const navigate = useNavigate();
+
+  // --- Security Logic ---
+  useEffect(() => {
+    if (!user || user.role.toLowerCase() !== 'admin') {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  if (!user) return null;
+  // ----------------------
+
   return (
     <div style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto', minHeight: '80vh', fontFamily: 'sans-serif' }}>
       <header style={{ marginBottom: '50px', borderLeft: '5px solid #d35400', paddingLeft: '20px' }}>

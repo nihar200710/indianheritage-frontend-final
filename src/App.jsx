@@ -25,7 +25,7 @@ import UserReports from './pages/UserReports';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
-// Protected Route Component: Logic to check if user is logged in & has correct role
+// Protected Route Component: Added safety checks to prevent 'toLowerCase' crash
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
   
@@ -33,17 +33,38 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
   
-  if (allowedRoles && !allowedRoles.includes(user.role.toLowerCase())) {
+  // 🛡️ Safe check: ensure role exists before calling toLowerCase
+  const userRole = user.role ? user.role.toLowerCase() : "";
+
+  if (allowedRoles && !allowedRoles.includes(userRole)) {
     return (
       <div className="container" style={{textAlign: 'center', marginTop: '50px'}}>
         <h2 style={{color: 'red'}}>Access Denied 🚫</h2>
         <p>You do not have permission to view this page.</p>
-        <p>Your Role: <strong>{user.role}</strong></p>
+        <p>Your Role: <strong>{user.role || "Unknown"}</strong></p>
       </div>
     );
   }
 
   return children;
+};
+
+// 🏠 Smart Home Redirect: Prevents the landing page from crashing if session is empty
+const HomeRedirect = () => {
+  const { user } = useAuth();
+  
+  if (!user) return <Home />;
+  
+  // Safe role check
+  const role = user.role ? user.role.toLowerCase() : "";
+  
+  switch(role) {
+    case 'admin': return <Navigate to="/admin-dashboard" />;
+    case 'creator': return <Navigate to="/creator-dashboard" />;
+    case 'guide': return <Navigate to="/guide-dashboard" />;
+    case 'enthusiast': return <Navigate to="/enthusiast-dashboard" />;
+    default: return <Home />;
+  }
 };
 
 const Navigation = () => {
@@ -62,7 +83,7 @@ function App() {
           <div style={{ flex: 1, width: '100%' }}>
             <Routes>
               {/* --- Public Routes --- */}
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<HomeRedirect />} />
               <Route path="/roles" element={<RoleSelection />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
@@ -108,7 +129,7 @@ function App() {
 
               {/* --- Shared & Other Roles --- */}
               <Route path="/explore" element={
-                <ProtectedRoute allowedRoles={['enthusiast', 'admin', 'guide']}>
+                <ProtectedRoute allowedRoles={['enthusiast', 'admin', 'guide', 'creator']}>
                   <HeritageExplore />
                 </ProtectedRoute>
               } />
@@ -127,6 +148,9 @@ function App() {
                   <GuideDashboard />
                 </ProtectedRoute>
               } />
+              
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" />} />
 
             </Routes>
           </div>

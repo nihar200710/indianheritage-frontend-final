@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Trash2, Shield, User as UserIcon, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Trash2, Shield, User as UserIcon, ArrowLeft, RefreshCw, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -14,7 +15,10 @@ export default function UserManagement() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:8080/api/users');
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:8080/api/users', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setUsers(res.data);
     } catch (err) {
       console.error("Fetch error:", err);
@@ -23,10 +27,31 @@ export default function UserManagement() {
     }
   };
 
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.put(`http://localhost:8080/api/users/${editingUser.id}`, {
+        name: editingUser.name,
+        role: editingUser.role
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUsers(users.map(u => (u.id === editingUser.id ? res.data : u)));
+      setEditingUser(null);
+    } catch (err) {
+      alert("Edit failed. Check console for details.");
+      console.error(err);
+    }
+  };
+
   const handleDelete = async (id, name) => {
     if (window.confirm(`Are you sure you want to delete ${name}?`)) {
       try {
-        await axios.delete(`http://localhost:8080/api/users/${id}`);
+        const token = localStorage.getItem('token');
+        await axios.delete(`http://localhost:8080/api/users/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
         setUsers(users.filter(u => u.id !== id));
       } catch (err) {
         alert("Action failed. Check if Backend is running.");
@@ -89,6 +114,13 @@ export default function UserManagement() {
                 </td>
                 <td style={tdStyle}>
                   <button 
+                    onClick={() => setEditingUser({ ...u, name: u.user || u.name || u.username, role: u.role || '' })}
+                    style={{ color: '#3b82f6', border: 'none', background: 'none', cursor: 'pointer', padding: '8px', borderRadius: '6px', marginRight: '5px' }}
+                    title="Edit User"
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button 
                     onClick={() => handleDelete(u.id, u.user || u.username || u.id)}
                     style={{ color: '#ef4444', border: 'none', background: 'none', cursor: 'pointer', padding: '8px', borderRadius: '6px' }}
                   >
@@ -100,6 +132,46 @@ export default function UserManagement() {
           </tbody>
         </table>
       </div>
+
+      {editingUser && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+          background: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000
+        }}>
+          <div style={{ background: 'white', padding: '30px', borderRadius: '12px', width: '400px', maxWidth: '90%' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#1e3a8a' }}>Edit User</h3>
+            <form onSubmit={handleEditSubmit}>
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Name</label>
+                <input 
+                  type="text" 
+                  value={editingUser.name || ''} 
+                  onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
+                  required
+                />
+              </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Role</label>
+                <select 
+                  value={editingUser.role} 
+                  onChange={(e) => setEditingUser({ ...editingUser, role: e.target.value })}
+                  style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc' }}
+                >
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="ENTHUSIAST">ENTHUSIAST</option>
+                  <option value="CREATOR">CREATOR</option>
+                  <option value="GUIDE">GUIDE</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button type="button" onClick={() => setEditingUser(null)} style={{ padding: '8px 16px', border: 'none', background: '#e2e8f0', color: '#334155', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
+                <button type="submit" style={{ padding: '8px 16px', border: 'none', background: '#3b82f6', color: 'white', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

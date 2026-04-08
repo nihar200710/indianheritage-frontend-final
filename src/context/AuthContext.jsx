@@ -10,32 +10,34 @@ export const AuthProvider = ({ children }) => {
     const saved = localStorage.getItem('currentUser');
     return saved ? JSON.parse(saved) : null;
   });
+  
   const navigate = useNavigate();
 
+  // Keep localStorage in sync with user state
   useEffect(() => {
     if (user) {
       localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem('token', user.token); // Save token separately for easy access
     } else {
       localStorage.removeItem('currentUser');
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
     }
   }, [user]);
 
   // 1. REGISTER FUNCTION
   const register = async (name, email, password, role) => {
     try {
+      // Backend returns Map.of("success", true)
       const response = await axios.post(`${API_BASE}/register`, { name, email, password, role });
-      if (response.data.success && response.data.user) {
-        const newUser = response.data.user;
-        setUser(newUser);
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
-        return { success: true, role: newUser.role };
+      
+      if (response.data.success) {
+        return { success: true };
       }
-      return { success: true };
+      return { success: false, message: "Registration failed." };
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        return { success: false, message: err.response.data.message };
-      }
-      return { success: false, message: "Registration failed due to server error." };
+      const msg = err.response?.data?.message || "Registration failed due to server error.";
+      return { success: false, message: msg };
     }
   };
 
@@ -44,11 +46,19 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await axios.post(`${API_BASE}/login`, { email, password });
       
-      if (response.data.success && response.data.user) {
-        const foundUser = response.data.user;
+      // Backend returns: { token, role, name, email }
+      if (response.data.token) {
+        const foundUser = response.data;
         setUser(foundUser);
         
-        switch(foundUser.role) {
+        // Save role specifically for quick RBAC checks
+        localStorage.setItem('role', foundUser.role);
+        
+        // Explicitly set token in localStorage as requested
+        localStorage.setItem('token', foundUser.token);
+
+        // Redirect based on role
+        switch(foundUser.role.toLowerCase()) {
           case 'admin': navigate('/admin-dashboard'); break;
           case 'enthusiast': navigate('/enthusiast-dashboard'); break;
           case 'creator': navigate('/creator-dashboard'); break;
@@ -59,15 +69,14 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, message: "Invalid credentials" };
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        return { success: false, message: err.response.data.message };
-      }
-      return { success: false, message: "Login failed due to server error." };
+      const msg = err.response?.data?.message || "Login failed due to server error.";
+      return { success: false, message: msg };
     }
   };
 
   const logout = () => {
     setUser(null);
+    localStorage.clear();
     navigate('/login');
   };
 

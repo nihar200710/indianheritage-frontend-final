@@ -16,7 +16,7 @@ export default function DiscussForum() {
 
   React.useEffect(() => {
     import('axios').then(axios => {
-      axios.get('http://localhost:8080/api/threads')
+      axios.get('https://indianheritage-backend-final.onrender.com/api/threads')
         .then(res => setThreads(res.data))
         .catch(err => console.error("Failed to fetch threads", err));
     });
@@ -26,7 +26,7 @@ export default function DiscussForum() {
     if (!replyText.trim()) return;
     try {
       const axios = (await import('axios')).default;
-      const response = await axios.post(`http://localhost:8080/api/threads/${selectedThread.id}/messages`, { user: "You", msg: replyText });
+      const response = await axios.post(`https://indianheritage-backend-final.onrender.com/api/threads/${selectedThread.id}/messages`, { user: "You", msg: replyText });
       
       const updatedThread = response.data;
       setThreads(threads.map(t => t.id === selectedThread.id ? updatedThread : t));
@@ -53,7 +53,7 @@ export default function DiscussForum() {
     
     try {
       const axios = (await import('axios')).default;
-      const response = await axios.post('http://localhost:8080/api/threads', newThread);
+      const response = await axios.post('https://indianheritage-backend-final.onrender.com/api/threads', newThread);
       // Add the new thread to the top of the list
       setThreads([response.data, ...threads]);
     } catch(err) {

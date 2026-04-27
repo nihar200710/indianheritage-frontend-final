@@ -27,7 +27,7 @@ cd sanchari-backend
 ./mvnw spring-boot:run
 ```
 *(Or use `mvn spring-boot:run` if you have Maven installed globally).*
-The backend API will be available at `http://localhost:8080`.
+The backend API will be available at `https://indianheritage-backend-final.onrender.com`.
 
 ### 2. React Frontend
 In a separate terminal, start the React Vite server from the project root:

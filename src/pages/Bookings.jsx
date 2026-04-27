@@ -17,7 +17,7 @@ export default function Bookings() {
 
   const fetchUserBookings = async () => {
     try {
-      const res = await axios.get(`http://localhost:8080/api/bookings/user/${authUser.id}`);
+      const res = await axios.get(`https://indianheritage-backend-final.onrender.com/api/bookings/user/${authUser.id}`);
       setBookings(res.data);
     } catch (err) {
       console.error("Failed to fetch bookings", err);
@@ -35,7 +35,7 @@ export default function Bookings() {
   const handleCancel = async (id) => {
     if (!window.confirm("Are you sure you want to cancel this tour?")) return;
     try {
-      await axios.put(`http://localhost:8080/api/bookings/${id}/cancel`);
+      await axios.put(`https://indianheritage-backend-final.onrender.com/api/bookings/${id}/cancel`);
       // Update local state to reflect change immediately
       setBookings(bookings.map(b =>
         b.id === id ? { ...b, status: 'Cancelled' } : b
@@ -64,7 +64,7 @@ export default function Bookings() {
     };
 
     try {
-      const response = await axios.post('http://localhost:8080/api/bookings', newBooking);
+      const response = await axios.post('https://indianheritage-backend-final.onrender.com/api/bookings', newBooking);
       setBookings([response.data, ...bookings]); // Add to top of list
 
       // Reset form and close

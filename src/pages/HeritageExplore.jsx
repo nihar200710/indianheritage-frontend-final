@@ -19,7 +19,7 @@ export default function HeritageExplore() {
   useEffect(() => {
     const fetchMonuments = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/monuments');
+        const res = await axios.get('https://indianheritage-backend-final.onrender.com/api/monuments');
         setMonuments(res.data);
       } catch (err) {
         console.error("Failed to fetch monuments", err);
@@ -70,10 +70,10 @@ export default function HeritageExplore() {
 
       const token = localStorage.getItem('token');
       
-      console.log("Sending POST to: http://localhost:8080/api/monuments");
+      console.log("Sending POST to: https://indianheritage-backend-final.onrender.com/api/monuments");
       console.log("With data:", newMonument);
 
-      const responseBackend = await axios.post('http://localhost:8080/api/monuments', newMonument, {
+      const responseBackend = await axios.post('https://indianheritage-backend-final.onrender.com/api/monuments', newMonument, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -98,7 +98,7 @@ export default function HeritageExplore() {
 
       try {
         const token = localStorage.getItem('token');
-        const responseBackend = await axios.post('http://localhost:8080/api/monuments', fallbackMonument, {
+        const responseBackend = await axios.post('https://indianheritage-backend-final.onrender.com/api/monuments', fallbackMonument, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setMonuments([responseBackend.data, ...monuments]);

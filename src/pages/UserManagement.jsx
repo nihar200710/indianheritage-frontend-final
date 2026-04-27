@@ -16,7 +16,7 @@ export default function UserManagement() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:8080/api/users', {
+      const res = await axios.get('https://indianheritage-backend-final.onrender.com/api/users', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(res.data);
@@ -31,7 +31,7 @@ export default function UserManagement() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.put(`http://localhost:8080/api/users/${editingUser.id}`, {
+      const res = await axios.put(`https://indianheritage-backend-final.onrender.com/api/users/${editingUser.id}`, {
         name: editingUser.name,
         role: editingUser.role
       }, {
@@ -49,7 +49,7 @@ export default function UserManagement() {
     if (window.confirm(`Are you sure you want to delete ${name}?`)) {
       try {
         const token = localStorage.getItem('token');
-        await axios.delete(`http://localhost:8080/api/users/${id}`, {
+        await axios.delete(`https://indianheritage-backend-final.onrender.com/api/users/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setUsers(users.filter(u => u.id !== id));

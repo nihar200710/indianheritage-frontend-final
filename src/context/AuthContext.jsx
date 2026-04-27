@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const AuthContext = createContext(null);
-const API_BASE = 'http://localhost:8080/api/auth';
+const API_BASE = 'https://indianheritage-backend-final.onrender.com0/api/auth';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {

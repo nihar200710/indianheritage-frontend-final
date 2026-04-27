@@ -1,16 +1,10 @@
 import axios from 'axios';
-console.log("Current API URL:", import.meta.env.VITE_API_URL);
-// This line forces Vite to check Vercel first, then local
-const getBaseURL = () => {
-  const url = import.meta.env.VITE_API_URL;
-  if (url) {
-    return url.endsWith('/') ? `${url}api` : `${url}/api`;
-  }
-  return 'http://localhost:8080/api';
-};
+
+// Hardcoding the live URL to bypass environment variable issues
+const baseURL = "https://indianheritage-backend-final.onrender.com/api";
 
 const api = axios.create({
-  baseURL: getBaseURL(),
+  baseURL: baseURL,
 });
 
 api.interceptors.request.use((config) => {

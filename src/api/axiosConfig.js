@@ -1,15 +1,14 @@
 import axios from 'axios';
 
-// Create a custom instance
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  // Vite looks for the VITE_API_URL variable. If it fails, it defaults to localhost.
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api', 
 });
 
 // The "Interceptor": This automatically adds your JWT to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
-    // This allows the Spring Boot Security we set up to recognize who you are
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

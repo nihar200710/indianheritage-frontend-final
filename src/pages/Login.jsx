@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail } from 'lucide-react';
-
+import axios from 'axios';
 // 👇 THIS LINE MUST SAY "export default"
 export default function Login() { 
   const [email, setEmail] = useState('');

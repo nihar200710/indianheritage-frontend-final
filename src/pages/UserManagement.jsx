@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, Shield, User as UserIcon, ArrowLeft, RefreshCw, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);

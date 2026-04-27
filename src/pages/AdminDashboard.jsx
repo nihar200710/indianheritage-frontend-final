@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'; // Added useEffect
 import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { useAuth } from '../context/AuthContext'; // Added useAuth
 import { Users, ShieldCheck, FileText, AlertTriangle, LayoutDashboard } from 'lucide-react';
+import axios from 'axios';
 
 export default function AdminDashboard() {
   const { user } = useAuth(); // Get user from context

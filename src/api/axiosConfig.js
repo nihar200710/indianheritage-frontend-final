@@ -1,11 +1,13 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // Vite looks for the VITE_API_URL variable. If it fails, it defaults to localhost.
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api', 
+  // If VITE_API_URL exists, add /api to it. Otherwise, use localhost.
+  baseURL: import.meta.env.VITE_API_URL 
+    ? `${import.meta.env.VITE_API_URL}/api` 
+    : 'http://localhost:8080/api',
 });
 
-// The "Interceptor": This automatically adds your JWT to every request
+// Interceptor: Adds JWT to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -16,7 +18,7 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// Response Interceptor: If the session expires, kick user to login
+// Response Interceptor: Handles session expiry
 api.interceptors.response.use(
   (response) => response,
   (error) => {

@@ -1,29 +1,20 @@
 import axios from 'axios';
 
-// We are forcing the live Render URL here to bypass environment variable issues
-const baseURL = "https://indianheritage-backend-final.onrender.com/api";
-
-console.log("Sanchari Backend connected to:", baseURL);
-
+// Forcing the live Render URL
 const api = axios.create({
-  baseURL: baseURL,
+  baseURL: "https://indianheritage-backend-final.onrender.com/api",
 });
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-}, (error) => Promise.reject(error));
-
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      localStorage.clear();
-      window.location.href = '/login';
+// Interceptor to add the token to every request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+    return config;
+  },
+  (error) => {
     return Promise.reject(error);
   }
 );

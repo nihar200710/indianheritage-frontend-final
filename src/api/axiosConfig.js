@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+console.log("Current API URL:", import.meta.env.VITE_API_URL);
 // This line forces Vite to check Vercel first, then local
 const getBaseURL = () => {
   const url = import.meta.env.VITE_API_URL;
